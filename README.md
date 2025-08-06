@@ -195,4 +195,4 @@ jsonapi.depth=2
 
 This library aims to simplify JSON:API conversions in Java/Spring projects. If you encounter any issues, feel free to open an [issue](https://github.com/drkmai/json-api-spring-boot/issues) or submit a PR!
 
-More examples available in: `src/main/java/com/drkmai/jsonapi/test`
+More examples available in: `src/main/java/com/derekmai/jsonapi/test`
