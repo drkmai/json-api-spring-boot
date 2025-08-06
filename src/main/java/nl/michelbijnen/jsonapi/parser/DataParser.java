@@ -4,8 +4,8 @@ import nl.michelbijnen.jsonapi.annotation.JsonApiId;
 import nl.michelbijnen.jsonapi.annotation.JsonApiObject;
 import nl.michelbijnen.jsonapi.exception.JsonApiException;
 import nl.michelbijnen.jsonapi.helper.GetterAndSetter;
-import org.json.JSONObject;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -24,12 +24,12 @@ class DataParser {
      * @param object The object to be converted to data
      * @return a json object with the object's data
      */
-    JSONObject parse(Object object) {
-        return this.parse(object, false);
+    ObjectNode parse(Object object, ObjectMapper mapper) {
+        return this.parse(object, false, mapper);
     }
 
-    JSONObject parse(Object object, boolean asRelation) {
-        JSONObject data = new JSONObject();
+    ObjectNode parse(Object object, boolean asRelation, ObjectMapper mapper) {
+        ObjectNode data = mapper.createObjectNode();
 
         data.put("type", this.getType(object));
         data.put("id", this.getId(object));
@@ -39,11 +39,15 @@ class DataParser {
         }
 
         AttributesParser attributesParser = new AttributesParser();
-        data.put("attributes", attributesParser.parse(object));
+        ObjectNode attributes = attributesParser.parse(object, mapper);
+        if (attributes.size() > 0) {
+            data.set("attributes", attributes);
+        }
 
-        JSONObject parsedRelationships = new RelationshipParser().parse(object);
-        if (!parsedRelationships.isEmpty())
-            data.put("relationships", parsedRelationships);
+        RelationshipParser relationshipParser = new RelationshipParser();
+        ObjectNode parsedRelationships = relationshipParser.parse(object, mapper);
+        if (parsedRelationships.size() > 0)
+            data.set("relationships", parsedRelationships);
 
         return data;
     }

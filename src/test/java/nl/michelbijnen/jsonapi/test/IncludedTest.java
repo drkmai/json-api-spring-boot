@@ -5,8 +5,9 @@ import nl.michelbijnen.jsonapi.test.mock.AppleDto;
 import nl.michelbijnen.jsonapi.test.mock.MockDataGenerator;
 import nl.michelbijnen.jsonapi.test.mock.ObjectDto;
 import nl.michelbijnen.jsonapi.test.mock.UserDto;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,51 +22,52 @@ public class IncludedTest {
     private UserDto userDto;
     private AppleDto appleDto;
     MockDataGenerator generator = MockDataGenerator.getInstance();
+    private ObjectMapper mapper;
 
     @Before
     public void before() throws CloneNotSupportedException {
-
         this.objectDto = (ObjectDto) generator.getObjectDto().clone();
         this.userDto = (UserDto) generator.getUserDto().clone();
         this.appleDto = (AppleDto) generator.getAppleDto().clone();
+        this.mapper = new ObjectMapper();
     }
 
     @Test
-    public void testIfIncludedExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included"));
+    public void testIfIncludedExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included"));
     }
 
     @Test
-    public void testIfIncludedIdWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals(objectDto.getOwner().getId(), jsonObject.getJSONArray("included").getJSONObject(0).getString("id"));
+    public void testIfIncludedIdWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals(objectDto.getOwner().getId(), json.get("included").get(0).get("id").asText());
     }
 
     @Test
-    public void testIfIncludedTypeWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals("User", jsonObject.getJSONArray("included").getJSONObject(0).getString("type"));
+    public void testIfIncludedTypeWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals("User", json.get("included").get(0).get("type").asText());
     }
 
     //region attributes
 
     @Test
-    public void testIfIncludedAttributesExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("attributes"));
+    public void testIfIncludedAttributesExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included").get(0).get("attributes"));
     }
 
     @Test
-    public void testIfIncludedAttributesUsernameWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals(objectDto.getOwner().getUsername(), jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("attributes").getString("username"));
+    public void testIfIncludedAttributesUsernameWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals(objectDto.getOwner().getUsername(), json.get("included").get(0).get("attributes").get("username").asText());
     }
 
     @Test
-    public void testIfIncludedAttributesEmailWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals(objectDto.getOwner().getEmail(), jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("attributes").getString("email"));
+    public void testIfIncludedAttributesEmailWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals(objectDto.getOwner().getEmail(), json.get("included").get(0).get("attributes").get("email").asText());
     }
 
     //endregion
@@ -73,22 +75,22 @@ public class IncludedTest {
     //region links
 
     @Test
-    public void testIfIncludedLinksExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("links"));
+    public void testIfIncludedLinksExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included").get(0).get("links"));
     }
 
     @Test
-    public void testIfIncludedLinksSelfWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals("http://localhost:8080/user/" + this.userDto.getId(), jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("links").getString("self"));
+    public void testIfIncludedLinksSelfWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals("http://localhost:8080/user/" + this.userDto.getId(), json.get("included").get(0).get("links").get("self").asText());
     }
 
     @Test
     @Ignore("Planned for future update")
-    public void testIfIncludedLinksNextWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals("http://localhost:8080/user/" + this.userDto.getId() + "?page=2", jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("links").getString("next"));
+    public void testIfIncludedLinksNextWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals("http://localhost:8080/user/" + this.userDto.getId() + "?page=2", json.get("included").get(0).get("links").get("next").asText());
     }
 
     //endregion
@@ -96,35 +98,35 @@ public class IncludedTest {
     //region relationships
 
     @Test
-    public void testIfIncludedRelationshipsExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships"));
+    public void testIfIncludedRelationshipsExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included").get(0).get("relationships"));
     }
 
     //region mainObject
 
     @Test
-    public void testIfIncludedRelationshipsMainObjectExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("mainObject"));
+    public void testIfIncludedRelationshipsMainObjectExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included").get(0).get("relationships").get("mainObject"));
     }
 
     @Test
-    public void testIfIncludedRelationshipsMainObjectDataExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("mainObject").getJSONObject("data"));
+    public void testIfIncludedRelationshipsMainObjectDataExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included").get(0).get("relationships").get("mainObject").get("data"));
     }
 
     @Test
-    public void testIfIncludedRelationshipsMainObjectDataIdWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals(objectDto.getOwner().getMainObject().getId(), jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("mainObject").getJSONObject("data").getString("id"));
+    public void testIfIncludedRelationshipsMainObjectDataIdWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals(objectDto.getOwner().getMainObject().getId(), json.get("included").get(0).get("relationships").get("mainObject").get("data").get("id").asText());
     }
 
     @Test
-    public void testIfIncludedRelationshipsMainObjectDataTypeWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertEquals("Object", jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("mainObject").getJSONObject("data").getString("type"));
+    public void testIfIncludedRelationshipsMainObjectDataTypeWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertEquals("Object", json.get("included").get(0).get("relationships").get("mainObject").get("data").get("type").asText());
     }
 
     //endregion
@@ -132,25 +134,25 @@ public class IncludedTest {
     //region childObjects
 
     @Test
-    public void testIfIncludedRelationshipsChildObjectsExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("childObjects"));
+    public void testIfIncludedRelationshipsChildObjectsExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included").get(0).get("relationships").get("childObjects"));
     }
 
     @Test
-    public void testIfIncludedRelationshipsChildObjectsDataExists() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        assertNotNull(jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("childObjects").getJSONArray("data"));
+    public void testIfIncludedRelationshipsChildObjectsDataExists() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        assertNotNull(json.get("included").get(0).get("relationships").get("childObjects").get("data"));
     }
 
     @Test
-    public void testIfIncludedRelationshipsChildObjectsDataIdWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        JSONArray childObjects = jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("childObjects").getJSONArray("data");
+    public void testIfIncludedRelationshipsChildObjectsDataIdWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        ArrayNode childObjects = (ArrayNode) json.get("included").get(0).get("relationships").get("childObjects").get("data");
         {
             boolean found = false;
-            for (int i = 0; i < childObjects.length(); i++) {
-                if (childObjects.getJSONObject(i).getString("id").equals(objectDto.getOwner().getChildObjects().get(0).getId())) {
+            for (int i = 0; i < childObjects.size(); i++) {
+                if (childObjects.get(i).get("id").asText().equals(objectDto.getOwner().getChildObjects().get(0).getId())) {
                     found = true;
                     break;
                 }
@@ -159,8 +161,8 @@ public class IncludedTest {
         }
         {
             boolean found = false;
-            for (int i = 0; i < childObjects.length(); i++) {
-                if (childObjects.getJSONObject(i).getString("id").equals(objectDto.getOwner().getChildObjects().get(1).getId())) {
+            for (int i = 0; i < childObjects.size(); i++) {
+                if (childObjects.get(i).get("id").asText().equals(objectDto.getOwner().getChildObjects().get(1).getId())) {
                     found = true;
                     break;
                 }
@@ -170,11 +172,11 @@ public class IncludedTest {
     }
 
     @Test
-    public void testIfIncludedRelationshipsChildObjectsDataTypeWorks() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
-        JSONArray childObjects = jsonObject.getJSONArray("included").getJSONObject(0).getJSONObject("relationships").getJSONObject("childObjects").getJSONArray("data");
-        for (int i = 0; i < childObjects.length(); i++) {
-            assertEquals("Object", childObjects.getJSONObject(i).getString("type"));
+    public void testIfIncludedRelationshipsChildObjectsDataTypeWorks() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(objectDto));
+        ArrayNode childObjects = (ArrayNode) json.get("included").get(0).get("relationships").get("childObjects").get("data");
+        for (int i = 0; i < childObjects.size(); i++) {
+            assertEquals("Object", childObjects.get(i).get("type").asText());
         }
     }
 
@@ -183,12 +185,12 @@ public class IncludedTest {
     //region depth
 
     @Test
-    public void testIfDepthIsWorking() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(userDto, 2));
-        JSONArray includedObjects = jsonObject.getJSONArray("included");
-        for (int i = 0; i < includedObjects.length(); i++) {
-            JSONObject included = includedObjects.getJSONObject(i);
-            if (included.getString("id").equals(this.appleDto.getId())) {
+    public void testIfDepthIsWorking() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(userDto, 2));
+        ArrayNode includedObjects = (ArrayNode) json.get("included");
+        for (int i = 0; i < includedObjects.size(); i++) {
+            JsonNode included = includedObjects.get(i);
+            if (included.get("id").asText().equals(this.appleDto.getId())) {
                 return;
             }
         }
@@ -196,12 +198,12 @@ public class IncludedTest {
     }
 
     @Test
-    public void testIfDepthIsCapping() {
-        JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(userDto, 1));
-        JSONArray includedObjects = jsonObject.getJSONArray("included");
-        for (int i = 0; i < includedObjects.length(); i++) {
-            JSONObject included = includedObjects.getJSONObject(i);
-            if (included.getString("id").equals(this.appleDto.getId())) {
+    public void testIfDepthIsCapping() throws Exception {
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(userDto, 1));
+        ArrayNode includedObjects = (ArrayNode) json.get("included");
+        for (int i = 0; i < includedObjects.size(); i++) {
+            JsonNode included = includedObjects.get(i);
+            if (included.get("id").asText().equals(this.appleDto.getId())) {
                 fail();
             }
         }
@@ -214,17 +216,17 @@ public class IncludedTest {
     //region double relations inside included
 
     @Test
-    public void testIfDoubleRelationsAreAddedOnlyOnceToIncludedFromList() {
+    public void testIfDoubleRelationsAreAddedOnlyOnceToIncludedFromList() throws Exception {
         userDto.getChildObjects().add(userDto.getChildObjects().get(0));
-        JSONArray included = new JSONObject(JsonApiConverter.convert(userDto)).getJSONArray("included");
-        for (int i = 0; i < included.length(); i++) {
-            String id = included.getJSONObject(i).getString("id");
-            String type = included.getJSONObject(i).getString("type");
+        ArrayNode included = (ArrayNode) mapper.readTree(JsonApiConverter.convert(userDto)).get("included");
+        for (int i = 0; i < included.size(); i++) {
+            String id = included.get(i).get("id").asText();
+            String type = included.get(i).get("type").asText();
 
             int c = 0;
-            for (int j = 0; j < included.length(); j++) {
-                String idToTest = included.getJSONObject(j).getString("id");
-                String typeToTest = included.getJSONObject(j).getString("type");
+            for (int j = 0; j < included.size(); j++) {
+                String idToTest = included.get(j).get("id").asText();
+                String typeToTest = included.get(j).get("type").asText();
 
                 if (id.equals(idToTest) && type.equals(typeToTest)) {
                     c++;
@@ -237,16 +239,16 @@ public class IncludedTest {
     }
 
     @Test
-    public void testIfDoubleRelationsAreAddedOnlyOnceToIncluded() {
-        JSONArray included = new JSONObject(JsonApiConverter.convert(userDto, 4)).getJSONArray("included");
-        for (int i = 0; i < included.length(); i++) {
-            String id = included.getJSONObject(i).getString("id");
-            String type = included.getJSONObject(i).getString("type");
+    public void testIfDoubleRelationsAreAddedOnlyOnceToIncluded() throws Exception {
+        ArrayNode included = (ArrayNode) mapper.readTree(JsonApiConverter.convert(userDto, 4)).get("included");
+        for (int i = 0; i < included.size(); i++) {
+            String id = included.get(i).get("id").asText();
+            String type = included.get(i).get("type").asText();
 
             int c = 0;
-            for (int j = 0; j < included.length(); j++) {
-                String idToTest = included.getJSONObject(j).getString("id");
-                String typeToTest = included.getJSONObject(j).getString("type");
+            for (int j = 0; j < included.size(); j++) {
+                String idToTest = included.get(j).get("id").asText();
+                String typeToTest = included.get(j).get("type").asText();
 
                 if (id.equals(idToTest) && type.equals(typeToTest)) {
                     c++;
@@ -259,7 +261,7 @@ public class IncludedTest {
     }
 
     @Test
-    public void testNoDuplicatesInIncluded() {
+    public void testNoDuplicatesInIncluded() throws Exception {
         // Arrange: Create two users sharing the same relations (shallow clone)
         UserDto user1 = generator.getUserDto();
         UserDto user2 = null;
@@ -275,18 +277,17 @@ public class IncludedTest {
         List<UserDto> users = Arrays.asList(user1, user2);
 
         // Use depth=2 to include nested relations like apples
-        String jsonString = JsonApiConverter.convert(users, 2);
-        JSONObject json = new JSONObject(jsonString);
+        JsonNode json = mapper.readTree(JsonApiConverter.convert(users, 2));
 
         // Act: Extract included array
-        JSONArray included = json.getJSONArray("included");
+        ArrayNode included = (ArrayNode) json.get("included");
 
         // Assert: No duplicates based on type and id
         Set<String> typeIdSet = new HashSet<>();
-        for (int i = 0; i < included.length(); i++) {
-            JSONObject obj = included.getJSONObject(i);
-            String type = obj.getString("type");
-            String id = obj.getString("id");
+        for (int i = 0; i < included.size(); i++) {
+            JsonNode obj = included.get(i);
+            String type = obj.get("type").asText();
+            String id = obj.get("id").asText();
             String key = type + ":" + id;
             assertFalse("Duplicate in included: " + key, typeIdSet.contains(key));
             typeIdSet.add(key);
