@@ -58,7 +58,7 @@ public class User {
 Extend the base class to handle IDs and links:
 
 ```java
-import generator.com.derekmai.jsonapi.JsonApiDtoExtendable;
+import com.derekmai.jsonapi.generator.JsonApiDtoExtendable;
 
 public class User extends JsonApiDtoExtendable {
     // ...
@@ -78,9 +78,9 @@ public class User extends JsonApiDtoExtendable {
 #### Example
 
 ```java
-import annotation.com.derekmai.jsonapi.JsonApiObject;
-import annotation.com.derekmai.jsonapi.JsonApiProperty;
-import generator.com.derekmai.jsonapi.JsonApiDtoExtendable;
+import com.derekmai.jsonapi.annotation.JsonApiObject;
+import com.derekmai.jsonapi.annotation.JsonApiProperty;
+import com.derekmai.jsonapi.generator.JsonApiDtoExtendable;
 
 @JsonApiObject("User")
 public class User extends JsonApiDtoExtendable {
@@ -172,7 +172,7 @@ jsonapi.baseurl=http://localhost:8081
 ### 5. Converting to JSON string
 
 ```java
-import parser.com.derekmai.jsonapi.JsonApiConverter;
+import com.derekmai.jsonapi.parser.JsonApiConverter;
 
 String result = JsonApiConverter.convert(user);
 ```
