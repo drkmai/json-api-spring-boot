@@ -81,12 +81,27 @@ class RelationshipParser {
 
         JSONArray dataForEach = new JSONArray();
         for (Object relationObject : relationObjectCollection) {
-            dataForEach.put(this.dataParser.parse(relationObject, true));
+            JSONObject dataObj = this.dataParser.parse(relationObject, true);
+            if (!this.dataExistsInArray(dataForEach, dataObj)) {
+                dataForEach.put(dataObj);
+            }
         }
         if (!dataForEach.isEmpty())
             relationship.put("data", dataForEach);
 
         return relationship;
+    }
+
+    private boolean dataExistsInArray(JSONArray dataArray, JSONObject newData) {
+        String id = newData.getString("id");
+        String type = newData.getString("type");
+        for (int i = 0; i < dataArray.length(); i++) {
+            JSONObject existing = dataArray.getJSONObject(i);
+            if (existing.getString("id").equals(id) && existing.getString("type").equals(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isList(Object object) {

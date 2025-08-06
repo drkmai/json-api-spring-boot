@@ -60,9 +60,7 @@ class JsonApiParser {
 
         JSONArray includedJsonArray = new JSONArray();
         for (Object loopObject : (Collection<Object>) object) {
-            for (Object includedObject : this.includedParser.parse(loopObject, maxDepth)) {
-                includedJsonArray.put(includedObject);
-            }
+            this.includedParser.parse(loopObject, includedJsonArray, maxDepth, 0);
         }
         if (includedJsonArray.length() != 0)
             jsonObject.put("included", includedJsonArray);

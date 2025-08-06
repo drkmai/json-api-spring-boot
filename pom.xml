@@ -4,17 +4,17 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>nl.michelbijnen.jsonapi</groupId>
+    <groupId>com.drkmai.jsonapi</groupId>
     <artifactId>json-api</artifactId>
-    <version>1.5.6</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>nl.michelbijnen.jsonapi:json-api-converter</name>
+    <name>com.drkmai.jsonapi:json-api-converter</name>
     <description>Converter for DTOs to json:api</description>
-    <url>https://github.com/MieskeB/json-api-spring-boot</url>
+    <url>https://github.com/drkmai/json-api-spring-boot</url>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -28,22 +28,16 @@
 
     <developers>
         <developer>
-            <id>mbijnen</id>
-            <name>Michel Bijnen</name>
-            <email>info@michelbijnen.nl</email>
-            <url>https://www.michelbijnen.nl/</url>
-        </developer>
-        <developer>
-            <id>sdeboer</id>
-            <name>Sander de Boer</name>
-            <email>info@sanderdeboer.me</email>
+            <id>drkmai</id>
+            <name>Derek Mai</name>
+            <email>drkmai@gmail.com</email>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/MieskeB/json-api-spring-boot.git</connection>
-        <developerConnection>scm:git:ssh://github.com:MieskeB/json-api-spring-boot.git</developerConnection>
-        <url>https://github.com/MieskeB/json-api-spring-boot</url>
+        <connection>scm:git:git://github.com/drkmai/json-api-spring-boot.git</connection>
+        <developerConnection>scm:git:ssh://github.com/drkmai/json-api-spring-boot.git</developerConnection>
+        <url>https://github.com/drkmai/json-api-spring-boot</url>
     </scm>
 
     <dependencies>

@@ -4,11 +4,17 @@ import nl.michelbijnen.jsonapi.parser.JsonApiConverter;
 import nl.michelbijnen.jsonapi.test.mock.MockDataGenerator;
 import nl.michelbijnen.jsonapi.test.mock.ObjectDto;
 import nl.michelbijnen.jsonapi.test.mock.UserDto;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -81,5 +87,39 @@ public class RelationTest {
     public void testIfRelationshipOwnerLinksRelatedWorks() {
         JSONObject jsonObject = new JSONObject(JsonApiConverter.convert(objectDto));
         assertEquals("http://localhost:8080/object/" + objectDto.getId() + "/user/" + objectDto.getOwner().getId(), jsonObject.getJSONObject("data").getJSONObject("relationships").getJSONObject("Owner").getJSONObject("links").getString("related"));
+    }
+
+    @Test
+    public void testNoDuplicatesInRelationship() {
+        // Arrange: Get the user and force duplicate in to-many relationship
+        UserDto user = generator.getUserDto();
+        List<ObjectDto> childObjects = new ArrayList<>();
+        ObjectDto child1 = user.getChildObjects().get(0);
+        childObjects.add(child1);
+        childObjects.add(child1); // Intentional duplicate
+        user.setChildObjects(childObjects);
+
+        String jsonString = JsonApiConverter.convert(user, 1);
+        JSONObject json = new JSONObject(jsonString);
+
+        // Act: Extract the relationship data for childObjects
+        JSONObject data = json.getJSONObject("data");
+        JSONObject relationships = data.getJSONObject("relationships");
+        JSONObject childRel = relationships.getJSONObject("childObjects");
+        JSONArray relData = childRel.getJSONArray("data");
+
+        // Assert: Only one unique entry in data array
+        assertEquals("Relationship data should have no duplicates", 1, relData.length());
+
+        // Additional check for uniqueness
+        Set<String> typeIdSet = new HashSet<>();
+        for (int i = 0; i < relData.length(); i++) {
+            JSONObject obj = relData.getJSONObject(i);
+            String type = obj.getString("type");
+            String id = obj.getString("id");
+            String key = type + ":" + id;
+            assertFalse("Duplicate in relationship data: " + key, typeIdSet.contains(key));
+            typeIdSet.add(key);
+        }
     }
 }

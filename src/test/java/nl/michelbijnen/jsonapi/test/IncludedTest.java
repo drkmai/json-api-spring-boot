@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -20,10 +20,11 @@ public class IncludedTest {
     private ObjectDto objectDto;
     private UserDto userDto;
     private AppleDto appleDto;
+    MockDataGenerator generator = MockDataGenerator.getInstance();
 
     @Before
     public void before() throws CloneNotSupportedException {
-        MockDataGenerator generator = MockDataGenerator.getInstance();
+
         this.objectDto = (ObjectDto) generator.getObjectDto().clone();
         this.userDto = (UserDto) generator.getUserDto().clone();
         this.appleDto = (AppleDto) generator.getAppleDto().clone();
@@ -254,6 +255,41 @@ public class IncludedTest {
                     }
                 }
             }
+        }
+    }
+
+    @Test
+    public void testNoDuplicatesInIncluded() {
+        // Arrange: Create two users sharing the same relations (shallow clone)
+        UserDto user1 = generator.getUserDto();
+        UserDto user2 = null;
+        try {
+            user2 = (UserDto) user1.clone();
+        } catch (CloneNotSupportedException e) {
+            fail("Clone failed: " + e.getMessage());
+        }
+        user2.setId("owner2");
+        user2.setUsername("the owner 2");
+        user2.setEmail("owner2@michelbijnen.nl");
+
+        List<UserDto> users = Arrays.asList(user1, user2);
+
+        // Use depth=2 to include nested relations like apples
+        String jsonString = JsonApiConverter.convert(users, 2);
+        JSONObject json = new JSONObject(jsonString);
+
+        // Act: Extract included array
+        JSONArray included = json.getJSONArray("included");
+
+        // Assert: No duplicates based on type and id
+        Set<String> typeIdSet = new HashSet<>();
+        for (int i = 0; i < included.length(); i++) {
+            JSONObject obj = included.getJSONObject(i);
+            String type = obj.getString("type");
+            String id = obj.getString("id");
+            String key = type + ":" + id;
+            assertFalse("Duplicate in included: " + key, typeIdSet.contains(key));
+            typeIdSet.add(key);
         }
     }
 
