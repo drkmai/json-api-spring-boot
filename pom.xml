@@ -4,12 +4,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.drkmai.jsonapi</groupId>
+    <groupId>com.derekmai.jsonapi</groupId>
     <artifactId>json-api</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>com.drkmai.jsonapi:json-api-converter</name>
+    <name>com.derekmai.jsonapi:json-api-converter</name>
     <description>Converter for DTOs to json:api</description>
     <url>https://github.com/drkmai/json-api-spring-boot</url>
 
